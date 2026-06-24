@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SecureFlow - Status do Sistema</title>
+    <link rel="stylesheet" href="src/styles/style.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="cabecalho">
+        <div class="logo-area">
+            <img src="src/image/logo.png" alt="Logo SecureFlow">
+        </div>
+        <h1>STATUS DO SISTEMA</h1>
+        <div class="notification-icon">
+            <img src="src/image/notificacao-icon.png" alt="Ícone de Notificação">
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        
+        <div class="left-block">
+            <h2>INTERFACE HARDWARE</h2>
+            <p class="subtitle">Mensagens de segurança e controle de temperatura em emergências.</p>
+
+            <div class="card status-card">
+                <div class="status-title">SISTEMA PRONTO</div>
+                <div class="card-footer">
+                    <span>16x2 LCD DISPLAY</span>
+                    <span>GRUPO 2 - SECUREFLOW</span>
+                </div>
+            </div>
+
+            <div class="card temp-card">
+                <div class="temp-header">
+                    <div class="temp-title-group">
+                        <h3>TEMPERATURA ATUAL</h3>
+                        <span class="badge badge-safe">SEGURO</span>
+                    </div>
+                    <div class="temp-value" id="temp-display">30°C</div>
+                </div>
+                <div class="chart-container">
+                    <div class="temp"></div>
+                    <div class="temp"></div>
+                    <div class="temp"></div>
+                    <div class="temp"></div>
+                    <div class="temp temp-blue"></div>
+                </div>
+            </div>
+        </div>
+
+        <section class="card gases-card">
+            <h3>ÍNDICE DE PRESENÇA DE GASES NOCIVOS</h3>
+            <p class="subtitle">Níveis de gases nocivos presentes no ambiente.</p>
+
+            <div class="progress-group">
+                <div class="progress-labels">
+                    <label>Concentração Estimada</label>
+                    <span class="value-highlight" id="gases-ppm">000 <span class="unit">PPM</span></span>
+                </div>
+                <p class="progress-sub">Monitoramento da qualidade do ar atual do ambiente</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="fill-concentracao" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <div class="progress-group">
+                <div class="progress-labels">
+                    <label>Nível de Risco</label>
+                </div>
+                <p class="progress-sub">Nível de risco atual no ambiente</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="fill-risco" style="width: 0%;"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card routes-card">
+            <h3>ILUMINAÇÃO & ROTAS DE SAÍDA</h3>
+            <p class="subtitle">Controle de iluminação de rotas de saída.</p>
+            
+            <div class="action-grid">
+                <button class="action-btn">
+                    <div class="btn-icon-wrapper"><i class="fa-solid fa-sun"></i></div>
+                    <span>LUZES DE SEGURANÇA</span>
+                </button>
+                <button class="action-btn">
+                    <div class="btn-icon-wrapper"><i class="fa-solid fa-map"></i></div>
+                    <span>ROTAS DE SAÍDA</span>
+                </button>
+                <button class="action-btn">
+                    <div class="btn-icon-wrapper"><i class="fa-solid fa-person-running"></i></div>
+                    <span>LUZES DE ROTA</span>
+                </button>
+                <button class="action-btn">
+                    <div class="btn-icon-wrapper"><i class="fa-solid fa-battery-three-quarters"></i></div>
+                    <span>ENERGIA DE EMERGÊNCIA</span>
+                </button>
+            </div>
+        </section>
+
+        <section class="card alert-card">
+            <div class="alert-content">
+                <h3>ALERTA!</h3>
+                <p>Altos níveis de temperatura no ambiente atual.</p>
+                <span class="badge badge-critical">CRÍTICO</span>
+            </div>
+        </section>
+
+        <section class="manual-alerts-card">
+            <h3>ALERTAS MANUAIS</h3>
+            
+            <button class="btn-alarm-local">
+                <img src="src/image/alerta-manual.png" alt="Alerta manual">
+                <span>ACIONAR ALARME LOCAL</span>
+            </button>
+
+            <button class="btn-dispatch">
+                <i class="fa-solid fa-asterisk"></i> CONTATAR DESPACHO
+            </button> 
+        </section>
+
+        <script src="src/script/dashboard.js"></script>
+    </main>
+</body>
+</html>
