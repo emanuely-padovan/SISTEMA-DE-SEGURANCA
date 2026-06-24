@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>SecureFlow - Status do Sistema</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js"></script>
     <link rel="stylesheet" href="src/styles/style.css">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -30,8 +28,7 @@
             <p class="subtitle">Mensagens de segurança e controle de temperatura em emergências.</p>
 
             <div class="card status-card">
-                <!-- Mensagem LCD -->
-                <div class="status-title">SISTEMA PRONTO</div>
+                <div class="status-title" id="lcd-display">SISTEMA PRONTO</div>
                 <div class="card-footer">
                     <span>16x2 LCD DISPLAY</span>
                     <span>GRUPO 2 - SECUREFLOW</span>
@@ -42,13 +39,10 @@
                 <div class="temp-header">
                     <div class="temp-title-group">
                         <h3>TEMPERATURA ATUAL</h3>
-                        <!-- Temperatura atual - Qualidade do Ambiente -->
-                        <span class="badge badge-safe">SEGURO</span>
+                        <span class="badge badge-safe" id="temp-badge">SEGURO</span>
                     </div>
-                    <!-- Temperatura -->
-                    <div class="temp-value" id="temp-display">30°C</div>
+                    <div class="temp-value" id="temp-display">--°C</div>
                 </div>
-                <!-- Gráfico de temperatura -->
                 <div class="chart-container">
                     <div class="temp"></div>
                     <div class="temp"></div>
@@ -66,11 +60,9 @@
             <div class="progress-group">
                 <div class="progress-labels">
                     <label>Concentração Estimada</label>
-                    <!-- Índice-->
-                    <span class="value-highlight" id="gases-ppm">000 <span class="unit">PPM</span></span>
+                    <span class="value-highlight" id="gases-ppm">000 <span class="unit">ADC</span></span>
                 </div>
                 <p class="progress-sub">Monitoramento da qualidade do ar atual do ambiente</p>
-                <!-- Progresso -->
                 <div class="progress-bar">
                     <div class="progress-fill" id="fill-concentracao" style="width: 0%;"></div>
                 </div>
@@ -81,7 +73,6 @@
                     <label>Nível de Risco</label>
                 </div>
                 <p class="progress-sub">Nível de risco atual no ambiente</p>
-                <!-- Progresso -->
                 <div class="progress-bar">
                     <div class="progress-fill" id="fill-risco" style="width: 0%;"></div>
                 </div>
@@ -112,34 +103,47 @@
             </div>
         </section>
 
-        <!-- Card de Alerta -->
-        <section class="card alert-card">
+        <section class="card alert-card" id="alert-card-panel">
             <div class="alert-content">
-                <h3>ALERTA!</h3>
-                <p>Temperatura atual do ambiente está estável.</p>
-                <span class="badge badge-critical">NORMAL</span>
+                <h3>STATUS GLOBAL</h3>
+                <p id="alert-text">Aguardando dados dos sensores...</p>
+                <span class="badge badge-critical" id="alert-badge">AGUARDANDO</span>
             </div>
         </section>
 
         <section class="manual-alerts-card">
             <h3>ALERTAS MANUAIS</h3>
             
-            <button class="btn-alarm-local">
-                <img src="src/image/alerta-manual.png" alt="Alerta manual">
-                <span>ACIONAR ALARME LOCAL</span>
+            <button class="btn-alarm-local" id="btn-toggle-alarme">
+                <img src="src/image/alerta-manual.png" alt="Alerta manual" style="height: 32px;">
+                <span id="txt-alarme-local">ACIONAR ALARME LOCAL</span>
             </button>
 
-            <button class="btn-dispatch">
+            <button class="btn-dispatch" id="btn-despacho">
                 <i class="fa-solid fa-asterisk"></i> CONTATAR DESPACHO
             </button> 
         </section>
 
         <section class="log-section">
-            <h2>Log de Mensagens</h2>
-            <pre id="log">Aguardando conexão...</pre>
+            <div class="log-header">
+                <h2><i class="fa-solid fa-terminal"></i> Log de Mensagens</h2>
+                <span class="log-counter" id="log-count">0 mensagens</span>
+            </div>
+            <p class="subtitle">Histórico de dados recebidos do broker MQTT em tempo real.</p>
+            
+            <div class="log-container" id="log-container">
+                <div class="log-card log-info">
+                    <div class="log-icon"><i class="fa-solid fa-circle-info"></i></div>
+                    <div class="log-body">
+                        <span class="log-timestamp">--:--:--</span>
+                        <p class="log-message">Aguardando inicialização e conexão com o broker...</p>
+                    </div>
+                </div>
+            </div>
         </section>
 
-        <script src="src/script/script.js"></script>
     </main>
+
+    <script src="src/script/script.js"></script>
 </body>
 </html>

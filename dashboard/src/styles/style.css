@@ -47,19 +47,17 @@ body {
     color: #e0e0e0;
 }
 
-/* GRID CONTAINER ABSOLUTO */
+/* GRID CONTAINER */
 .dashboard-container {
     display: grid;
-    /* Definição exata das proporções das 3 colunas */
     grid-template-columns: 1fr 0.75fr 0.8fr;
-    /* Força alturas independentes para as linhas */
-    grid-template-rows: auto auto; 
+    grid-template-rows: auto auto auto; 
     gap: 25px;
     flex-grow: 1;
-    /* Mapeamento visual do layout */
     grid-template-areas: 
         "hardware gases   gases"
-        "rotas    alerta  manuais";
+        "rotas    alerta  manuais"
+        "logs     logs    logs";
 }
 
 /* CONFIGURAÇÃO DOS CARDS */
@@ -88,15 +86,15 @@ h3 {
     letter-spacing: 0.5px;
 }
 
-/* VINCULAÇÃO DOS ELEMENTOS ÀS ÁREAS DO GRID */
+/* MAPEAMENTO GRID */
+.left-block { grid-area: hardware; display: flex; flex-direction: column; }
+.gases-card { grid-area: gases; height: fit-content; }
+.routes-card { grid-area: rotas; }
+.alert-card { grid-area: alerta; background-color: #2c2c2c; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; padding-left: 30px; align-self: start; min-height: 140px; }
+.manual-alerts-card { grid-area: manuais; display: flex; flex-direction: column; gap: 15px; }
+.log-section { grid-area: logs; }
 
-/* 1. Bloco da Esquerda (Interface Hardware + Temperatura) */
-.left-block {
-    grid-area: hardware;
-    display: flex;
-    flex-direction: column;
-}
-
+/* CARD STATUS HARDWARE */
 .status-card {
     background-color: #212121;
     height: 135px;
@@ -115,6 +113,7 @@ h3 {
     font-weight: 700;
     letter-spacing: 2px;
     margin-bottom: 12px;
+    text-align: center;
 }
 
 .card-footer {
@@ -128,6 +127,7 @@ h3 {
     color: #666;
 }
 
+/* CARD TEMPERATURA */
 .temp-card {
     background-color: #212121;
     flex-grow: 1;
@@ -156,6 +156,7 @@ h3 {
     padding: 3px 12px;
     border-radius: 20px;
     display: inline-block;
+    text-transform: uppercase;
 }
 
 .badge-safe {
@@ -183,121 +184,34 @@ h3 {
     flex: 1;
     background-color: #e0e0e0;
     border-radius: 1px;
+    height: 60%;
 }
 
 .temp-blue {
     background-color: #0066ff;
+    height: 85%;
 }
 
-/* 2. Card Gases Nocivos (Topo Centro/Direito) */
-.gases-card {
-    grid-area: gases;
-    height: fit-content;
-}
+/* BARRA DE PROGRESSO - GASES */
+.progress-group { margin-bottom: 20px; }
+.progress-group:last-child { margin-bottom: 5px; }
+.progress-labels { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 600; }
+.value-highlight { font-size: 18px; font-weight: 700; }
+.value-highlight .unit { font-size: 11px; color: #8c8c8c; }
+.progress-sub { font-size: 11px; color: #8c8c8c; margin-top: 2px; margin-bottom: 8px; }
+.progress-bar { width: 100%; height: 26px; background-color: #444444; border-radius: 13px; overflow: hidden; }
+.progress-fill { height: 100%; background-color: #0066ff; border-radius: 13px; transition: width 0.5s ease; }
 
-.progress-group {
-    margin-bottom: 20px;
-}
+/* INTERFACE DE INTERAÇÃO BOTÕES */
+.action-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.action-btn { background-color: #444444; border: none; border-radius: 10px; padding: 15px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; cursor: pointer; transition: background 0.2s; }
+.btn-icon-wrapper { background-color: #ffffff; color: #333333; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.action-btn span { color: #ffffff; font-size: 9px; font-weight: 700; text-align: center; line-height: 1.2; }
 
-.progress-group:last-child {
-    margin-bottom: 5px;
-}
+.action-btn.active { background-color: #0066ff; }
+.action-btn.active .btn-icon-wrapper { color: #0066ff; }
 
-.progress-labels {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.value-highlight {
-    font-size: 18px;
-    font-weight: 700;
-}
-
-.value-highlight .unit {
-    font-size: 11px;
-    color: #8c8c8c;
-}
-
-.progress-sub {
-    font-size: 11px;
-    color: #8c8c8c;
-    margin-top: 2px;
-    margin-bottom: 8px;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 26px;
-    background-color: #444444;
-    border-radius: 13px;
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 100%;
-    background-color: #0066ff;
-    border-radius: 13px;
-}
-
-/* 3. Card Iluminação & Rotas (Canto Inferior Esquerdo) */
-.routes-card {
-    grid-area: rotas;
-}
-
-.action-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-}
-
-.action-btn {
-    background-color: #444444;
-    border: none;
-    border-radius: 10px;
-    padding: 15px 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    cursor: pointer;
-}
-
-.btn-icon-wrapper {
-    background-color: #ffffff;
-    color: #333333;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-}
-
-.action-btn span {
-    color: #ffffff;
-    font-size: 9px;
-    font-weight: 700;
-    text-align: center;
-    line-height: 1.2;
-}
-
-/* 4. Card Alerta Crítico (Canto Inferior Centro) */
-.alert-card {
-    grid-area: alerta;
-    background-color: #2c2c2c;
-    display: flex;
-    justify-content: space-between;
-    position: relative;
-    overflow: hidden;
-    padding-left: 30px;
-    align-self: start;
-}
-
+/* CARD ALERTA LATERAL INDICAÇÃO */
 .alert-card::before {
     content: '';
     position: absolute;
@@ -305,95 +219,51 @@ h3 {
     top: 0;
     bottom: 0;
     width: 6px;
-    background-color: #47ff33;
+    background-color: #8c8c8c;
 }
+.alert-card.status-safe::before { background-color: #47ff33; }
+.alert-card.status-warning::before { background-color: #ffcc00; }
+.alert-card.status-danger::before { background-color: #ff3333; }
 
-.alert-content h3 {
-    color: #ffffff;
-    font-size: 16px;
-    margin-bottom: 5px;
-}
+.alert-content h3 { color: #ffffff; font-size: 16px; margin-bottom: 5px; }
+.alert-content p { font-size: 11px; color: #b3b3b3; margin-bottom: 15px; }
+.badge-critical { border: 1px solid #8c8c8c; color: #8c8c8c; background: transparent; }
 
-.alert-content p {
-    font-size: 11px;
-    color: #b3b3b3;
-    margin-bottom: 15px;
-}
+/* BOTÕES DE EMERGÊNCIA MANUAIS */
+.btn-alarm-local { background-color: #d32f2f; border: none; border-radius: 10px; flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; cursor: pointer; color: #ffffff; min-height: 110px; transition: background 0.2s; }
+.btn-alarm-local:hover { background-color: #b71c1c; }
+.btn-alarm-local.active-alarm { background-color: #0066ff; } /* Transforma em azul ou outra cor quando desativável */
+.btn-alarm-local span { font-weight: 700; font-size: 13px; letter-spacing: 0.5px; }
 
-.badge-critical {
-    border: 1px solid #47ff33;
-    color: #47ff33;
-    background: transparent;
-}
+.btn-dispatch { background-color: transparent; border: 1px solid #ff3333; border-radius: 10px; color: #ff3333; padding: 14px; font-weight: 700; font-size: 12px; letter-spacing: 0.5px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
-.alert-indicator {
-    width: 12px;
-    height: 12px;
-    background-color: #ffffff;
-    border-radius: 50%;
-    margin-top: 5px;
-}
+/* SEÇÃO LOGS */
+.log-section { background-color: #14141c; border-radius: 12px; padding: 22px; border: 1px solid #232330; margin-top: 10px; }
+.log-header { display: flex; justify-content: space-between; align-items: center; }
+.log-counter { font-size: 11px; background-color: #2c2c2c; padding: 4px 10px; border-radius: 12px; color: #8c8c8c; font-weight: 600; }
+.log-container { display: flex; flex-direction: column; gap: 10px; max-height: 220px; overflow-y: auto; padding-right: 5px; margin-top: 15px; }
 
-/* 5. Seção Alertas Manuais (Canto Inferior Direito) */
-.manual-alerts-card {
-    grid-area: manuais;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
+.log-container::-webkit-scrollbar { width: 6px; }
+.log-container::-webkit-scrollbar-track { background: #14141c; }
+.log-container::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
 
-.manual-alerts-card h3 {
-    font-size: 15px;
-    letter-spacing: 0.5px;
-}
+/* LOG CARDS INDIVIDUAIS */
+.log-card { background-color: #212121; border-left: 4px solid #8c8c8c; border-radius: 6px; padding: 12px 16px; display: flex; align-items: center; gap: 14px; animation: fadeInLog 0.3s ease-out; }
+.log-icon { font-size: 16px; color: #8c8c8c; }
+.log-body { display: flex; flex-direction: column; gap: 2px; }
+.log-timestamp { font-family: monospace; font-size: 10px; color: #666; font-weight: bold; }
+.log-message { font-size: 12px; color: #e0e0e0; line-height: 1.4; }
 
-.btn-alarm-local {
-    background-color: #d32f2f;
-    border: none;
-    border-radius: 10px;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    cursor: pointer;
-    color: #ffffff;
-    min-height: 110px;
-}
+.log-card.log-success { border-left-color: #47ff33; }
+.log-card.log-success .log-icon { color: #47ff33; }
+.log-card.log-warning { border-left-color: #ffcc00; }
+.log-card.log-warning .log-icon { color: #ffcc00; }
+.log-card.log-danger { border-left-color: #ff3333; }
+.log-card.log-danger .log-icon { color: #ff3333; }
+.log-card.log-info { border-left-color: #0066ff; }
+.log-card.log-info .log-icon { color: #0066ff; }
 
-.btn-alarm-local i {
-    font-size: 26px;
-}
-
-.btn-alarm-local span {
-    font-weight: 700;
-    font-size: 13px;
-    letter-spacing: 0.5px;
-}
-
-.btn-dispatch {
-    background-color: transparent;
-    border: 1px solid #ff3333;
-    border-radius: 10px;
-    color: #ff3333;
-    padding: 14px;
-    font-weight: 700;
-    font-size: 12px;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-/* Efeito visual quando o botão está ativo (via JavaScript) */
-.action-btn.active {
-    background-color: #0066ff; /* Cor azul de destaque do sistema */
-}
-
-.action-btn.active .btn-icon-wrapper {
-    background-color: #ffffff;
-    color: #0066ff;
+@keyframes fadeInLog {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
 }
