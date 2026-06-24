@@ -110,7 +110,7 @@ h3 {
 }
 
 .status-title {
-    color: #00e676;
+    color: #47ff33;
     font-size: 19px;
     font-weight: 700;
     letter-spacing: 2px;
@@ -165,7 +165,7 @@ h3 {
 }
 
 .temp-value {
-    color: #00e676;
+    color: #47ff33;
     font-size: 44px;
     font-weight: 700;
     line-height: 1;
@@ -305,7 +305,7 @@ h3 {
     top: 0;
     bottom: 0;
     width: 6px;
-    background-color: #ff3333;
+    background-color: #47ff33;
 }
 
 .alert-content h3 {
@@ -321,8 +321,8 @@ h3 {
 }
 
 .badge-critical {
-    border: 1px solid #ff3333;
-    color: #ff3333;
+    border: 1px solid #47ff33;
+    color: #47ff33;
     background: transparent;
 }
 

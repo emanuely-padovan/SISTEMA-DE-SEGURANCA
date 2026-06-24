@@ -1,152 +1,238 @@
-// script.js — Dashboard IoT | SENAI Ítalo Bologna — Aula 10
-//
-// Este arquivo faz duas coisas:
-//   1. SUBSCRIBER: recebe dados dos sensores (DHT22 + LDR) do Pico
-//   2. PUBLISHER: envia comandos (led:on / led:off) para o Pico
-//
-// Comunicação via MQTT.js usando WebSocket (ws://)
-// O browser não consegue TCP puro — por isso usa WebSocket na porta 8000
+// ================= CONFIG MQTT =================
 
-// ─── CONFIGURAÇÃO ────────────────────────────────────────────────────────────
-// Muda só aqui para trocar de broker (local → professor → online)
 const CONFIG = {
-    broker:    "ws://192.168.1.XXX:8000",  // ← IP do notebook broker + porta WebSocket
-    topicSub:  "senai/grupo2/sensores",     // ← mesmo tópico que o Pico publica
-    topicPub:  "senai/grupo2/comandos",     // ← tópico que o Pico assina
-    clientId:  "dashboard_" + Math.random().toString(16).slice(2, 8)
-    // clientId aleatório evita conflito se dois browsers abrirem ao mesmo tempo
+    broker: "ws://10.132.112.5:9001",
+    topicSub: "senai/grupo2/sensores",
+    topicPub: "senai/grupo2/comandos",
+    clientId: "dashboard_" + Math.random().toString(16).slice(2,8)
+};
+
+let cliente = null;
+
+// ================= ELEMENTOS =================
+
+const logEl = document.getElementById("log");
+
+const tempDisplay = document.getElementById("temp-display");
+const gasDisplay = document.getElementById("gases-ppm");
+
+const fillConcentracao = document.getElementById("fill-concentracao");
+const fillRisco = document.getElementById("fill-risco");
+
+// ================= LOG =================
+
+function log(msg) {
+    const hora = new Date().toLocaleTimeString("pt-BR");
+
+    logEl.textContent += `[${hora}] ${msg}\n`;
+    logEl.scrollTop = logEl.scrollHeight;
 }
 
-// ─── VARIÁVEIS DE ESTADO ─────────────────────────────────────────────────────
-let cliente = null
+// ================= PROCESSAR MQTT =================
 
-// ─── ELEMENTOS DO DOM ────────────────────────────────────────────────────────
-const statusDot = document.getElementById("status-dot")
-const statusTexto = document.getElementById("status-texto")
-const ultimaAtu = document.getElementById("ultima-atualizacao")
-const btnOn = document.getElementById("btn-on")
-const btnOff = document.getElementById("btn-off")
-const logEl = document.getElementById("log")
-
-// ─── FUNÇÕES AUXILIARES ──────────────────────────────────────────────────────
-
-// Adiciona linha no log com hora e cor por tipo
-function log(mensagem, tipo = "info") {
-    const cores = {
-        info:     "#8b949e",
-        sucesso:  "#00ff88",
-        erro:     "#ff4444",
-        recebido: "#ffaa00",
-        enviado:  "#00d4ff"
-    }
-    const hora = new Date().toLocaleTimeString("pt-BR")
-    logEl.innerHTML += `<span style="color:${cores[tipo]}">[${hora}] ${mensagem}</span>\n`
-    logEl.scrollTop = logEl.scrollHeight
-}
-
-// Atualiza o indicador de status na barra superior
-function setStatus(conectado, texto) {
-    statusDot.className   = "status-dot" + (conectado ? " conectado" : "")
-    statusTexto.textContent = texto
-    btnOn.disabled  = !conectado
-    btnOff.disabled = !conectado
-}
-
-// Atualiza a hora da última leitura recebida
-function marcarAtualizacao() {
-    ultimaAtu.textContent = "Última leitura: " + new Date().toLocaleTimeString("pt-BR")
-}
-
-// ─── PROCESSAR MENSAGEM RECEBIDA ─────────────────────────────────────────────
-// Exemplo de mensagem: "temp:24.5,umid:58.0,ldr:72.3"
 function processarMensagem(mensagem) {
-    log(`[REC] ${mensagem}`, "recebido")
 
-    // Separa cada par chave:valor
-    const partes = mensagem.split(",")
+    log("Recebido: " + mensagem);
 
-    partes.forEach(parte => {
-        const [chave, valor] = parte.split(":")
+    const dados = {};
 
-        if (chave === "temp") {
-            document.getElementById("temperatura").textContent = valor
+    mensagem.split(",").forEach(item => {
 
-            // Alerta visual se temperatura acima de 30°C
-            const cardTemp = document.querySelector(".card-temp")
-            cardTemp.classList.toggle("alerta", parseFloat(valor) > 30)
+        const partes = item.split(":");
+
+        if (partes.length >= 2) {
+
+            const chave = partes[0].trim();
+            const valor = partes.slice(1).join(":").trim();
+
+            dados[chave] = valor;
+        }
+    });
+
+    // TEMPERATURA
+
+    if (dados["Temperatura"]) {
+
+        const temp = parseFloat(dados["Temperatura"]);
+
+        tempDisplay.textContent = temp.toFixed(1) + "°C";
+
+        const badge = document.querySelector(".badge-safe");
+
+        if (temp >= 50) {
+            badge.textContent = "EMERGÊNCIA";
+        }
+        else if (temp >= 35) {
+            badge.textContent = "ATENÇÃO";
+        }
+        else {
+            badge.textContent = "SEGURO";
+        }
+    }
+
+    // GÁS
+
+    if (dados["Gás"]) {
+
+        const gas = parseInt(dados["Gás"]);
+
+        gasDisplay.innerHTML =
+            `${gas} <span class="unit">PPM</span>`;
+
+        let percentual = (gas / 65535) * 100;
+
+        if (percentual > 100) {
+            percentual = 100;
         }
 
-        if (chave === "umid") {
-            document.getElementById("umidade").textContent = valor
-        }
+        fillConcentracao.style.width = percentual + "%";
 
-        if (chave === "ldr") {
-            document.getElementById("luminosidade").textContent = valor
+        if (gas >= 55000) {
+            fillRisco.style.width = "100%";
         }
-    })
+        else if (gas >= 45000) {
+            fillRisco.style.width = "60%";
+        }
+        else {
+            fillRisco.style.width = "20%";
+        }
+    }
 
-    marcarAtualizacao()
+    // ESTADO
+
+    if (dados["Estado"]) {
+
+        const estado = dados["Estado"];
+
+        document.querySelector(".status-title").textContent = estado;
+
+        const alertaTexto =
+            document.querySelector(".alert-card p");
+
+        const alertaBadge =
+            document.querySelector(".badge-critical");
+
+        switch (estado) {
+
+            case "SEGURO":
+                alertaTexto.textContent =
+                    "Ambiente operando normalmente.";
+                alertaBadge.textContent = "NORMAL";
+                break;
+
+            case "ATENCAO":
+                alertaTexto.textContent =
+                    "Possível risco detectado.";
+                alertaBadge.textContent = "ATENÇÃO";
+                break;
+
+            case "EMERGENCIA":
+                alertaTexto.textContent =
+                    "Evacuação recomendada!";
+                alertaBadge.textContent = "EMERGÊNCIA";
+                break;
+
+            case "MANUAL":
+                alertaTexto.textContent =
+                    "Alarme manual acionado.";
+                alertaBadge.textContent = "MANUAL";
+                break;
+        }
+    }
 }
 
-// ─── CONEXÃO MQTT ────────────────────────────────────────────────────────────
-function conectar() {
-    log(`Conectando ao broker: ${CONFIG.broker}...`)
-    setStatus(false, "Conectando...")
+// ================= MQTT =================
 
-    // mqtt.connect() — ponto de entrada da biblioteca MQTT.js
-    // "ws://" indica WebSocket sem criptografia
+function conectar() {
+
+    console.log("Tentando conectar:", CONFIG.broker);
+
     cliente = mqtt.connect(CONFIG.broker, {
         clientId: CONFIG.clientId,
         clean: true,
-        connectTimeout: 10000
-    })
+        connectTimeout: 5000
+    });
 
-    // ── Evento: conexão estabelecida ──────────────────────────────────────────
     cliente.on("connect", () => {
-        setStatus(true, "Conectado ao broker")
-        log("Conectado com sucesso!", "sucesso")
 
-        // Assina o tópico onde o Pico publica os dados dos sensores
-        cliente.subscribe(CONFIG.topicSub, (err) => {
-            if (!err) {
-                log(`[SUB] Assinando: ${CONFIG.topicSub}`, "info")
+        console.log("CONECTOU!");
+
+        log("Conectado!");
+
+        cliente.subscribe(CONFIG.topicSub, (erro) => {
+
+            if (erro) {
+                console.error("Erro subscribe:", erro);
+            } else {
+                console.log("Inscrito em:", CONFIG.topicSub);
             }
-        })
-    })
+        });
+    });
 
-    // ── Evento: mensagem recebida ─────────────────────────────────────────────
-    // Chamado sempre que o broker entrega uma mensagem no tópico assinado
     cliente.on("message", (topico, payload) => {
-        // payload chega como bytes — toString() converte para texto
-        // Mesmo conceito do .decode() do MicroPython
-        const mensagem = payload.toString()
-        processarMensagem(mensagem)
-    })
 
-    // ── Evento: erro de conexão ───────────────────────────────────────────────
-    cliente.on("error", (err) => {
-        log(`[ERRO] ${err.message}`, "erro")
-        setStatus(false, "Erro de conexão")
-    })
+        console.log("TOPICO:", topico);
+        console.log("MSG:", payload.toString());
 
-    // ── Evento: desconexão ────────────────────────────────────────────────────
+        processarMensagem(payload.toString());
+    });
+
+    cliente.on("error", (erro) => {
+
+        console.error("MQTT ERRO:", erro);
+
+        log("Erro MQTT");
+    });
+
     cliente.on("close", () => {
-        setStatus(false, "Desconectado")
-        log("Conexão encerrada.", "erro")
-    })
+
+        console.log("MQTT FECHADO");
+
+        log("Desconectado");
+    });
 }
 
-// ─── PUBLICAR COMANDO PARA O PICO ────────────────────────────────────────────
-// Chamado pelos botões "Ligar LED" e "Desligar LED" no HTML
-function publicarComando(comando) {
-    if (!cliente || !cliente.connected) return
+// ================= PUBLICAR =================
 
-    // publish(tópico, mensagem)
-    // O Pico está assinando CONFIG.topicPub e vai receber este comando
-    cliente.publish(CONFIG.topicPub, comando)
-    log(`[PUB] Comando enviado: "${comando}"`, "enviado")
+function enviarComando(comando) {
+
+    if (!cliente || !cliente.connected) {
+        log("Broker desconectado.");
+        return;
+    }
+
+    cliente.publish(CONFIG.topicPub, comando);
+
+    log("Enviado: " + comando);
 }
 
-// ─── INICIALIZAÇÃO ────────────────────────────────────────────────────────────
-// Conecta automaticamente ao abrir o dashboard
-conectar()
+// ================= BOTÕES =================
+
+document.getElementById("btn-luz")
+.addEventListener("click", () => {
+    enviarComando("teste:verde");
+});
+
+document.getElementById("btn-rotas")
+.addEventListener("click", () => {
+    enviarComando("teste:amarelo");
+});
+
+document.getElementById("btn-luz-rotas")
+.addEventListener("click", () => {
+    enviarComando("teste:vermelho");
+});
+
+document.getElementById("btn-energia")
+.addEventListener("click", () => {
+    enviarComando("teste:speaker");
+});
+
+document.querySelector(".btn-alarm-local")
+.addEventListener("click", () => {
+    enviarComando("alarme:manual");
+});
+
+// ================= START =================
+
+conectar();

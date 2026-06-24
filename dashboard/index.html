@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>SecureFlow - Status do Sistema</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js"></script>
     <link rel="stylesheet" href="src/styles/style.css">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -29,6 +30,7 @@
             <p class="subtitle">Mensagens de segurança e controle de temperatura em emergências.</p>
 
             <div class="card status-card">
+                <!-- Mensagem LCD -->
                 <div class="status-title">SISTEMA PRONTO</div>
                 <div class="card-footer">
                     <span>16x2 LCD DISPLAY</span>
@@ -40,10 +42,13 @@
                 <div class="temp-header">
                     <div class="temp-title-group">
                         <h3>TEMPERATURA ATUAL</h3>
+                        <!-- Temperatura atual - Qualidade do Ambiente -->
                         <span class="badge badge-safe">SEGURO</span>
                     </div>
+                    <!-- Temperatura -->
                     <div class="temp-value" id="temp-display">30°C</div>
                 </div>
+                <!-- Gráfico de temperatura -->
                 <div class="chart-container">
                     <div class="temp"></div>
                     <div class="temp"></div>
@@ -61,9 +66,11 @@
             <div class="progress-group">
                 <div class="progress-labels">
                     <label>Concentração Estimada</label>
+                    <!-- Índice-->
                     <span class="value-highlight" id="gases-ppm">000 <span class="unit">PPM</span></span>
                 </div>
                 <p class="progress-sub">Monitoramento da qualidade do ar atual do ambiente</p>
+                <!-- Progresso -->
                 <div class="progress-bar">
                     <div class="progress-fill" id="fill-concentracao" style="width: 0%;"></div>
                 </div>
@@ -74,6 +81,7 @@
                     <label>Nível de Risco</label>
                 </div>
                 <p class="progress-sub">Nível de risco atual no ambiente</p>
+                <!-- Progresso -->
                 <div class="progress-bar">
                     <div class="progress-fill" id="fill-risco" style="width: 0%;"></div>
                 </div>
@@ -85,30 +93,31 @@
             <p class="subtitle">Controle de iluminação de rotas de saída.</p>
             
             <div class="action-grid">
-                <button class="action-btn">
+                <button class="action-btn" id="btn-luz">
                     <div class="btn-icon-wrapper"><i class="fa-solid fa-sun"></i></div>
                     <span>LUZES DE SEGURANÇA</span>
                 </button>
-                <button class="action-btn">
+                <button class="action-btn" id="btn-rotas">
                     <div class="btn-icon-wrapper"><i class="fa-solid fa-map"></i></div>
                     <span>ROTAS DE SAÍDA</span>
                 </button>
-                <button class="action-btn">
+                <button class="action-btn" id="btn-luz-rotas">
                     <div class="btn-icon-wrapper"><i class="fa-solid fa-person-running"></i></div>
                     <span>LUZES DE ROTA</span>
                 </button>
-                <button class="action-btn">
+                <button class="action-btn" id="btn-energia">
                     <div class="btn-icon-wrapper"><i class="fa-solid fa-battery-three-quarters"></i></div>
                     <span>ENERGIA DE EMERGÊNCIA</span>
                 </button>
             </div>
         </section>
 
+        <!-- Card de Alerta -->
         <section class="card alert-card">
             <div class="alert-content">
                 <h3>ALERTA!</h3>
-                <p>Altos níveis de temperatura no ambiente atual.</p>
-                <span class="badge badge-critical">CRÍTICO</span>
+                <p>Temperatura atual do ambiente está estável.</p>
+                <span class="badge badge-critical">NORMAL</span>
             </div>
         </section>
 
@@ -125,7 +134,12 @@
             </button> 
         </section>
 
-        <script src="src/script/dashboard.js"></script>
+        <section class="log-section">
+            <h2>Log de Mensagens</h2>
+            <pre id="log">Aguardando conexão...</pre>
+        </section>
+
+        <script src="src/script/script.js"></script>
     </main>
 </body>
 </html>
